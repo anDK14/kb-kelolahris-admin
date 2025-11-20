@@ -26,26 +26,6 @@ class LogoConfigResource extends Resource
 
     protected static ?int $navigationSort = 98;
 
-    public static function getConfigKeyOptions(): array
-    {
-        return [
-            'navbar_logo' => 'Logo Navbar',
-            'footer_logo' => 'Logo Footer',
-            'favicon' => 'Favicon',
-            'mobile_logo' => 'Logo Mobile App',
-            'admin_logo' => 'Logo Admin Panel',
-            'email_logo' => 'Logo Email Signature',
-            'print_logo' => 'Logo Cetak/Dokumen',
-            'dark_logo' => 'Logo Mode Gelap',
-            'light_logo' => 'Logo Mode Terang',
-        ];
-    }
-
-    public static function getConfigKeyLabel(string $key): string
-    {
-        return self::getConfigKeyOptions()[$key] ?? $key;
-    }
-
     public static function form(Form $form): Form
     {
         return $form
@@ -55,30 +35,21 @@ class LogoConfigResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('config_key')
                             ->label('Jenis Konfigurasi')
-                            ->options(self::getConfigKeyOptions())
+                            ->options([
+                                'navbar_logo' => 'Logo Navbar',
+                                'footer_logo' => 'Logo Footer',
+                                // 'favicon' => 'Favicon',
+                                // 'mobile_logo' => 'Logo Mobile App',
+                                // 'admin_logo' => 'Logo Admin Panel',
+                                // 'email_logo' => 'Logo Email Signature',
+                                // 'print_logo' => 'Logo Cetak/Dokumen',
+                                // 'dark_logo' => 'Logo Mode Gelap',
+                                // 'light_logo' => 'Logo Mode Terang',
+                            ])
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->disabled(fn($record) => $record !== null)
-                            ->helperText('Pilih bagian website yang ingin diatur logonya')
-                            ->reactive()
-                            ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                // Set default alt text berdasarkan pilihan
-                                $defaultAlts = [
-                                    'navbar_logo' => 'Vascomm Logo',
-                                    'footer_logo' => 'KelolaHR Logo',
-                                    'favicon' => 'Favicon Website',
-                                    'mobile_logo' => 'Logo Aplikasi Mobile',
-                                    'admin_logo' => 'Logo Admin Panel',
-                                    'email_logo' => 'Logo Signature Email',
-                                    'print_logo' => 'Logo Dokumen Cetak',
-                                    'dark_logo' => 'Logo Mode Gelap',
-                                    'light_logo' => 'Logo Mode Terang',
-                                ];
-                                
-                                if (isset($defaultAlts[$state])) {
-                                    $set('logo_alt', $defaultAlts[$state]);
-                                }
-                            }),
+                            ->helperText('Pilih bagian website yang ingin diatur logonya'),
                     ]),
 
                 Forms\Components\Section::make('Pengaturan Logo')
@@ -129,7 +100,18 @@ class LogoConfigResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('config_key')
                     ->label('Jenis Konfigurasi')
-                    ->formatStateUsing(fn($state) => self::getConfigKeyLabel($state))
+                    ->formatStateUsing(fn($state) => match ($state) {
+                        'navbar_logo' => 'Logo Navbar',
+                        'footer_logo' => 'Logo Footer',
+                        // 'favicon' => 'Favicon',
+                        // 'mobile_logo' => 'Logo Mobile App',
+                        // 'admin_logo' => 'Logo Admin Panel',
+                        // 'email_logo' => 'Logo Email Signature',
+                        // 'print_logo' => 'Logo Cetak/Dokumen',
+                        // 'dark_logo' => 'Logo Mode Gelap',
+                        // 'light_logo' => 'Logo Mode Terang',
+                        default => $state
+                    })
                     ->sortable()
                     ->searchable(),
 
@@ -177,21 +159,31 @@ class LogoConfigResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('config_key')
                     ->label('Jenis Konfigurasi')
-                    ->options(self::getConfigKeyOptions())
+                    ->options([
+                        'navbar_logo' => 'Logo Navbar',
+                        'footer_logo' => 'Logo Footer',
+                        // 'favicon' => 'Favicon',
+                        // 'mobile_logo' => 'Logo Mobile App',
+                        // 'admin_logo' => 'Logo Admin Panel',
+                        // 'email_logo' => 'Logo Email Signature',
+                        // 'print_logo' => 'Logo Cetak/Dokumen',
+                        // 'dark_logo' => 'Logo Mode Gelap',
+                        // 'light_logo' => 'Logo Mode Terang',
+                    ])
                     ->placeholder('Semua Jenis'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make()
-                        ->label('Edit')
-                        ->tooltip('Edit konfigurasi logo'),
-                    
                     Tables\Actions\Action::make('preview')
                         ->label('Preview')
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->url(fn($record) => $record->logo_url, shouldOpenInNewTab: true)
                         ->tooltip('Lihat logo di tab baru'),
+
+                    Tables\Actions\EditAction::make()
+                        ->label('Edit')
+                        ->tooltip('Edit konfigurasi logo'),
                 ])
                     ->label('Aksi')
                     ->icon('heroicon-o-cog-6-tooth')
@@ -200,10 +192,10 @@ class LogoConfigResource extends Resource
                     ->button(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label('Hapus yang dipilih'),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make()
+                //         ->label('Hapus yang dipilih'),
+                // ]),
             ])
             ->emptyStateHeading('Belum ada konfigurasi logo')
             ->emptyStateDescription('Buat konfigurasi logo pertama Anda dengan mengklik tombol di bawah.')
@@ -231,15 +223,13 @@ class LogoConfigResource extends Resource
         return static::getModel()::count() ?: null;
     }
 
-    // Opsional: Batasi create hanya untuk jenis yang belum ada
     public static function canCreate(): bool
     {
-        // Jika ingin unlimited, return true saja
-        return true;
-        
-        // Jika ingin batasi hanya jenis tertentu yang bisa dibuat
-        // $existingConfigs = static::getModel()::pluck('config_key')->toArray();
-        // $availableConfigs = array_keys(self::getConfigKeyOptions());
-        // return count(array_diff($availableConfigs, $existingConfigs)) > 0;
+        return false;
+    }
+
+    public static function canDelete($record): bool
+    {
+        return false;
     }
 }

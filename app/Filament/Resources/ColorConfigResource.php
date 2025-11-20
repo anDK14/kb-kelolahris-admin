@@ -112,10 +112,10 @@ class ColorConfigResource extends Resource
                     ->button(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label('Hapus yang dipilih'),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make()
+                //         ->label('Hapus yang dipilih'),
+                // ]),
             ])
             ->emptyStateHeading('Belum ada konfigurasi warna')
             ->emptyStateDescription('Buat konfigurasi warna pertama Anda dengan mengklik tombol di bawah.')
@@ -141,5 +141,15 @@ class ColorConfigResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count() ?: null;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canDelete($record): bool
+    {
+        return false;
     }
 }

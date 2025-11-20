@@ -16,13 +16,13 @@ class LogoConfigResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
-    protected static ?string $navigationGroup = 'Sistem';
+    protected static ?string $navigationGroup = 'Theme';
 
     protected static ?string $navigationLabel = 'Konfigurasi Logo';
 
     protected static ?string $modelLabel = 'Konfigurasi Logo';
 
-    protected static ?string $pluralModelLabel = 'Konfigurasi Logo';
+    protected static ?string $pluralModelLabel = 'Data Konfigurasi Logo';
 
     protected static ?int $navigationSort = 98;
 
@@ -218,10 +218,10 @@ class LogoConfigResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count() ?: null;
-    }
+    // public static function getNavigationBadge(): ?string
+    // {
+    //     return static::getModel()::count() ?: null;
+    // }
 
     public static function canCreate(): bool
     {

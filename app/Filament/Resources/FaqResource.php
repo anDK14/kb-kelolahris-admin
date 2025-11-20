@@ -23,13 +23,15 @@ class FaqResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
 
-    protected static ?string $navigationGroup = 'Dukungan';
+    protected static ?string $navigationGroup = 'FAQ';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationLabel = 'FAQ';
 
-    protected static ?string $label = 'FAQ';
+    protected static ?string $modelLabel = 'FAQ';
 
-    protected static ?string $pluralLabel = 'FAQ';
+    protected static ?string $pluralModelLabel = 'Data FAQ';
+
+    protected static ?int $navigationSort = -70;
 
     public static function form(Form $form): Form
     {
@@ -115,7 +117,7 @@ class FaqResource extends Resource
                     ->searchable()
                     ->placeholder('—')
                     ->color('primary')
-                    ->weight('medium')
+                    ->weight('semibold')
                     ->size('lg'),
 
                 Tables\Columns\TextColumn::make('mobile_feature_id')
@@ -133,7 +135,8 @@ class FaqResource extends Resource
                     ->searchable()
                     ->placeholder('—')
                     ->color('secondary')
-                    ->weight('medium'),
+                    ->weight('semibold')
+                    ->size('lg'),
 
                 Tables\Columns\TextColumn::make('question')
                     ->label('Pertanyaan')

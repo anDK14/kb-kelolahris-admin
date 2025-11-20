@@ -18,15 +18,17 @@ class MobileFeatureResource extends Resource
 {
     protected static ?string $model = MobileFeature::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-device-phone-mobile';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
-    protected static ?string $navigationGroup = 'Konten Mobile';
+    protected static ?string $navigationGroup = 'Mobile';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationLabel = 'Fitur Mobile';
 
-    protected static ?string $label = 'Fitur Mobile';
+    protected static ?string $modelLabel = 'Fitur Mobile';
 
-    protected static ?string $pluralLabel = 'Fitur Mobile';
+    protected static ?string $pluralModelLabel = 'Data Fitur Mobile';
+
+    protected static ?int $navigationSort = -80;
 
     public static function form(Form $form): Form
     {

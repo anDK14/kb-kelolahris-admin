@@ -18,15 +18,15 @@ class WebsiteFeatureContentResource extends Resource
 {
     protected static ?string $model = WebsiteFeatureContent::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
-    protected static ?string $navigationGroup = 'Konten Website';
+    protected static ?string $navigationGroup = 'Website';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationLabel = 'Konten Website';
 
-    protected static ?string $label = 'Konten Website';
+    protected static ?string $modelLabel = 'Konten Website';
 
-    protected static ?string $pluralLabel = 'Konten Website';
+    protected static ?string $pluralModelLabel = 'Data Konten Website';
 
     public static function form(Form $form): Form
     {

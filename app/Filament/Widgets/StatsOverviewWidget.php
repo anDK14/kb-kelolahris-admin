@@ -21,33 +21,39 @@ class StatsOverviewWidget extends BaseWidget
             Stat::make('Total Modul Website', Module::count())
                 ->description('Jumlah modul website')
                 ->descriptionIcon('heroicon-m-computer-desktop')
-                ->color('primary'),
+                ->color('primary')
+                ->url(route('filament.admin.resources.modules.index')),
 
             Stat::make('Total Fitur Website', Module::count())
                 ->description('Jumlah fitur website')
-                ->descriptionIcon('heroicon-m-cog')
-                ->color('secondary'),
+                ->descriptionIcon('heroicon-o-globe-alt')
+                ->color('secondary')
+                ->url(route('filament.admin.resources.submodules.index')),
 
             Stat::make('Konten Website', WebsiteFeatureContent::count())
                 ->description('Total konten website')
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('success'),
+                ->descriptionIcon('heroicon-o-newspaper')
+                ->color('success')
+                ->url(route('filament.admin.resources.website-feature-contents.index')),
 
             // Statistik Mobile
             Stat::make('Total Modul Mobile', MobileModule::count())
                 ->description('Jumlah modul mobile')
                 ->descriptionIcon('heroicon-m-device-phone-mobile')
-                ->color('primary'),
+                ->color('primary')
+                ->url(route('filament.admin.resources.mobile-modules.index')),
 
             Stat::make('Total Fitur Mobile', MobileFeature::count())
                 ->description('Jumlah fitur mobile')
-                ->descriptionIcon('heroicon-m-cog')
-                ->color('secondary'),
+                ->descriptionIcon('heroicon-o-globe-alt')
+                ->color('secondary')
+                ->url(route('filament.admin.resources.mobile-features.index')),
 
             Stat::make('Konten Mobile', MobileFeatureContent::count())
                 ->description('Total konten mobile')
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('success'),
+                ->descriptionIcon('heroicon-o-newspaper')
+                ->color('success')
+                ->url(route('filament.admin.resources.mobile-feature-contents.index')),
 
             // Statistik FAQ
             // Stat::make('Total FAQ', Faq::count())

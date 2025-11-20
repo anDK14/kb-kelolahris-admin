@@ -29,7 +29,7 @@ class ListFaqs extends ListRecords
                     ])),
             ])
             ->label('Tambah FAQ')
-            ->icon('heroicon-o-plus')
+            ->icon('')
             ->button()
             ->color('primary'),
         ];

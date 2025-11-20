@@ -16,15 +16,15 @@ class ColorConfigResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-swatch';
 
-    protected static ?string $navigationGroup = 'Sistem';
+    protected static ?string $navigationGroup = 'Theme';
 
     protected static ?string $navigationLabel = 'Konfigurasi Warna';
 
     protected static ?string $modelLabel = 'Konfigurasi Warna';
 
-    protected static ?string $pluralModelLabel = 'Konfigurasi Warna';
+    protected static ?string $pluralModelLabel = 'Data Konfigurasi Warna';
 
-    protected static ?int $navigationSort = 99;
+    protected static ?int $navigationSort = -60;
 
     public static function form(Form $form): Form
     {
@@ -138,10 +138,10 @@ class ColorConfigResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count() ?: null;
-    }
+    // public static function getNavigationBadge(): ?string
+    // {
+    //     return static::getModel()::count() ?: null;
+    // }
 
     public static function canCreate(): bool
     {

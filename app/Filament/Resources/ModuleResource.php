@@ -17,15 +17,17 @@ class ModuleResource extends Resource
 {
     protected static ?string $model = Module::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $navigationIcon = 'heroicon-m-computer-desktop';
 
-    protected static ?string $navigationGroup = 'Konten Website';
+    protected static ?string $navigationGroup = 'Website';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationLabel = 'Modul Website';
 
-    protected static ?string $label = 'Modul Website';
+    protected static ?string $modelLabel = 'Modul Website';
 
-    protected static ?string $pluralLabel = 'Modul Website';
+    protected static ?string $pluralModelLabel = 'Data Modul Website';
+
+    protected static ?int $navigationSort = -100;
 
     public static function form(Form $form): Form
     {

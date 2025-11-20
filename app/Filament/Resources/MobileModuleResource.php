@@ -17,15 +17,17 @@ class MobileModuleResource extends Resource
 {
     protected static ?string $model = MobileModule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-device-tablet';
+    protected static ?string $navigationIcon = 'heroicon-o-device-phone-mobile';
 
-    protected static ?string $navigationGroup = 'Konten Mobile';
+    protected static ?string $navigationGroup = 'Mobile';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationLabel = 'Modul Mobile';
 
-    protected static ?string $label = 'Modul Mobile';
+    protected static ?string $modelLabel = 'Modul Mobile';
 
-    protected static ?string $pluralLabel = 'Modul Mobile';
+    protected static ?string $pluralModelLabel = 'Data Modul Mobile';
+
+    protected static ?int $navigationSort = -90;
 
     public static function form(Form $form): Form
     {

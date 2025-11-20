@@ -44,7 +44,7 @@ class ListMobileFeatureContents extends ListRecords
                     ])),
             ])
                 ->label('Tambah Konten')
-                ->icon('heroicon-o-plus')
+                ->icon('')
                 ->button()
                 ->color('primary'),
         ];

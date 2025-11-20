@@ -18,15 +18,15 @@ class SubmoduleResource extends Resource
 {
     protected static ?string $model = Submodule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cube';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
 
-    protected static ?string $navigationGroup = 'Konten Website';
+    protected static ?string $navigationGroup = 'Website';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationLabel = 'Fitur Website';
 
-    protected static ?string $label = 'Fitur Website';
+    protected static ?string $modelLabel = 'Fitur Website';
 
-    protected static ?string $pluralLabel = 'Fitur Website';
+    protected static ?string $pluralModelLabel = 'Data Fitur Website';
 
     public static function form(Form $form): Form
     {

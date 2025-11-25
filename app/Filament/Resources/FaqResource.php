@@ -234,23 +234,23 @@ class FaqResource extends Resource
                     ])
                     ->action(function (array $data) {
                         $query = Faq::with(['submodule', 'mobileFeature']);
+                        $featureType = $data['feature_type'];
 
-                        if ($data['feature_type'] === 'website') {
+                        if ($featureType === 'website') {
                             $query->whereNotNull('submodule_id')->whereNull('mobile_feature_id');
-                        } elseif ($data['feature_type'] === 'mobile') {
+                        } elseif ($featureType === 'mobile') {
                             $query->whereNull('submodule_id')->whereNotNull('mobile_feature_id');
                         }
 
                         $faqs = $query->get();
 
-                        // Pastikan view 'exports.faqs-pdf' sudah dibuat
                         $pdf = Pdf::loadView('exports.faqs-pdf', [
                             'faqs' => $faqs,
-                            'filterType' => $data['feature_type'],
+                            'feature_type' => $featureType, // Kirim variabel langsung, bukan array $data
                         ])->setPaper('a4', 'portrait');
 
                         return Response::streamDownload(
-                            fn () => print($pdf->output()),
+                            fn() => print($pdf->output()),
                             'faq-' . now()->format('Y-m-d_H-i-s') . '.pdf'
                         );
                     }),

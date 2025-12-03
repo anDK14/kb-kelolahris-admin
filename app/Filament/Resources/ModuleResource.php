@@ -138,6 +138,7 @@ class ModuleResource extends Resource
                         ->icon('heroicon-o-trash'),
                 ]),
             ])
+            ->defaultSort('updated_at', 'desc')
             ->recordUrl(null)
             ->striped()
             ->deferLoading();

@@ -151,7 +151,8 @@ class RoleResource extends Resource implements HasShieldPermissions
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()->label('Hapus yang Dipilih'),
-            ]);
+            ])
+            ->defaultSort('updated_at', 'desc');
     }
 
     public static function getRelations(): array

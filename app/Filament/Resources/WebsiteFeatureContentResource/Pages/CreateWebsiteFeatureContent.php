@@ -12,12 +12,8 @@ class CreateWebsiteFeatureContent extends CreateRecord
 {
     protected static string $resource = WebsiteFeatureContentResource::class;
 
-    /**
-     * Mutasi data sebelum disimpan ke database.
-     */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // 1️⃣ Ambil nilai tipe konten dari URL kalau belum ada
         $data['content_type'] = $data['content_type'] ?? request()->query('content_type');
 
         if (empty($data['content_type'])) {
@@ -29,7 +25,6 @@ class CreateWebsiteFeatureContent extends CreateRecord
                 ->send();
         }
 
-        // 2️⃣ Tentukan urutan otomatis berdasarkan submodule dan tipe konten
         if (!empty($data['submodule_id']) && !empty($data['content_type'])) {
             $lastOrder = WebsiteFeatureContent::where('submodule_id', $data['submodule_id'])
                 ->where('content_type', $data['content_type'])
@@ -37,24 +32,12 @@ class CreateWebsiteFeatureContent extends CreateRecord
 
             $data['content_order'] = $lastOrder ? $lastOrder + 1 : 1;
         } else {
-            // Jika belum ada submodule_id (belum dipilih)
             $data['content_order'] = 1;
         }
 
         return $data;
     }
 
-    /**
-     * Mengembalikan pengguna ke halaman yang benar setelah membuat data.
-     */
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
-
-    /**
-     * Notifikasi sukses setelah membuat data.
-     */
     protected function getCreatedNotification(): ?Notification
     {
         return Notification::make()
@@ -64,9 +47,6 @@ class CreateWebsiteFeatureContent extends CreateRecord
             ->send();
     }
 
-    /**
-     * Tindakan header halaman.
-     */
     protected function getHeaderActions(): array
     {
         return [
@@ -78,9 +58,6 @@ class CreateWebsiteFeatureContent extends CreateRecord
         ];
     }
 
-    /**
-     * Mengatur judul halaman
-     */
     public function getTitle(): string
     {
         $contentType = request()->query('content_type', 'fitur_utama');
@@ -95,5 +72,15 @@ class CreateWebsiteFeatureContent extends CreateRecord
         $typeLabel = $typeLabels[$contentType] ?? 'Konten Website';
 
         return "Tambah {$typeLabel}";
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return $this->getResource()::getModelLabel() . ' berhasil dibuat!';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

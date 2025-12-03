@@ -9,4 +9,14 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateModule extends CreateRecord
 {
     protected static string $resource = ModuleResource::class;
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return $this->getResource()::getModelLabel() . ' berhasil dibuat!';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

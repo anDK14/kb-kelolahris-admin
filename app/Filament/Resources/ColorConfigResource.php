@@ -31,18 +31,25 @@ class ColorConfigResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Pengaturan Konfigurasi')
-                    ->description('Pilih jenis konfigurasi warna yang ingin diatur')
+                    ->description('Pilih jenis dan tipe konfigurasi warna')
                     ->schema([
-                        Forms\Components\Select::make('config_key')
-                            ->label('Jenis Konfigurasi')
+                        Forms\Components\Select::make('type')
+                            ->label('Tipe Area')
                             ->options([
-                                'navbar_gradient' => 'Gradien Navbar',
-                                'footer_gradient' => 'Gradien Footer',
+                                'navbar' => 'Navbar',
+                                'footer' => 'Footer',
                             ])
                             ->required()
-                            ->unique(ignoreRecord: true)
                             ->disabled(fn($record) => $record !== null)
                             ->helperText('Pilih bagian website yang ingin diatur warnanya'),
+                            
+                        Forms\Components\TextInput::make('config_key')
+                            ->label('Kunci Konfigurasi')
+                            ->default('bg_utama')
+                            ->required()
+                            ->disabled(fn($record) => $record !== null)
+                            ->helperText('Nama unik untuk konfigurasi ini')
+                            ->rules(['regex:/^[a-z0-9_]+$/']),
                     ]),
 
                 Forms\Components\Section::make('Pengaturan Warna Gradien')
@@ -63,6 +70,18 @@ class ColorConfigResource extends Resource
                                     ->live(),
                             ]),
                     ]),
+                    
+                Forms\Components\Section::make('Status')
+                    ->description('Aktifkan atau nonaktifkan konfigurasi ini')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Aktif')
+                            ->default(true)
+                            ->required()
+                            ->helperText('Jika dinonaktifkan, warna default akan digunakan')
+                            ->onColor('success')
+                            ->offColor('danger'),
+                    ]),
             ]);
     }
 
@@ -70,11 +89,20 @@ class ColorConfigResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('config_key')
-                    ->label('Jenis Konfigurasi')
+                Tables\Columns\TextColumn::make('type')
+                    ->label('Tipe Area')
                     ->formatStateUsing(fn($state) => match ($state) {
-                        'navbar_gradient' => 'Gradien Navbar',
-                        'footer_gradient' => 'Gradien Footer',
+                        'navbar' => 'Navbar',
+                        'footer' => 'Footer',
+                        default => ucfirst($state)
+                    })
+                    ->sortable()
+                    ->searchable(),
+                    
+                Tables\Columns\TextColumn::make('config_key')
+                    ->label('Kunci Konfigurasi')
+                    ->formatStateUsing(fn($state) => match ($state) {
+                        'bg_utama' => 'Background Utama',
                         default => $state
                     })
                     ->sortable()
@@ -89,6 +117,15 @@ class ColorConfigResource extends Resource
                     ->label('Warna Akhir')
                     ->copyable()
                     ->copyMessage('Warna akhir disalin!'),
+                    
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Status')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Terakhir Diperbarui')
@@ -97,13 +134,40 @@ class ColorConfigResource extends Resource
                     ->description(fn($record) => $record->updated_at->diffForHumans()),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('type')
+                    ->label('Tipe Area')
+                    ->options([
+                        'navbar' => 'Navbar',
+                        'footer' => 'Footer',
+                    ]),
+                    
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Status Aktif')
+                    ->placeholder('Semua')
+                    ->trueLabel('Aktif')
+                    ->falseLabel('Nonaktif'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()
                         ->label('Edit')
                         ->tooltip('Edit konfigurasi warna'),
+                        
+                    Tables\Actions\Action::make('toggleActive')
+                        ->label(fn(ColorConfig $record): string => $record->is_active ? 'Nonaktifkan' : 'Aktifkan')
+                        ->icon(fn(ColorConfig $record): string => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn(ColorConfig $record): string => $record->is_active ? 'danger' : 'success')
+                        ->action(function (ColorConfig $record) {
+                            $record->update([
+                                'is_active' => !$record->is_active
+                            ]);
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading(fn(ColorConfig $record): string => $record->is_active ? 'Nonaktifkan Konfigurasi?' : 'Aktifkan Konfigurasi?')
+                        ->modalDescription(fn(ColorConfig $record): string => $record->is_active 
+                            ? 'Konfigurasi warna ini akan dinonaktifkan. Warna default akan digunakan.' 
+                            : 'Konfigurasi warna ini akan diaktifkan dan akan digunakan di website.')
+                        ->modalSubmitActionLabel(fn(ColorConfig $record): string => $record->is_active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan'),
                 ])
                     ->label('Aksi')
                     ->icon('heroicon-o-cog-6-tooth')
@@ -112,18 +176,44 @@ class ColorConfigResource extends Resource
                     ->button(),
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make()
-                //         ->label('Hapus yang dipilih'),
-                // ]),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('activate')
+                        ->label('Aktifkan')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                $record->update(['is_active' => true]);
+                            }
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('Aktifkan Konfigurasi')
+                        ->modalDescription('Konfigurasi yang dipilih akan diaktifkan.')
+                        ->deselectRecordsAfterCompletion(),
+                        
+                    Tables\Actions\BulkAction::make('deactivate')
+                        ->label('Nonaktifkan')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                $record->update(['is_active' => false]);
+                            }
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('Nonaktifkan Konfigurasi')
+                        ->modalDescription('Konfigurasi yang dipilih akan dinonaktifkan.')
+                        ->deselectRecordsAfterCompletion(),
+                ]),
             ])
             ->emptyStateHeading('Belum ada konfigurasi warna')
-            ->emptyStateDescription('Buat konfigurasi warna pertama Anda dengan mengklik tombol di bawah.')
+            ->emptyStateDescription('Klik tombol di bawah untuk membuat konfigurasi warna pertama.')
             ->emptyStateActions([
                 Tables\Actions\CreateAction::make()
                     ->label('Buat Konfigurasi Warna')
                     ->icon('heroicon-o-plus'),
             ])
+            ->defaultSort('type')
             ->recordUrl(null)
             ->striped()
             ->deferLoading();
@@ -138,10 +228,15 @@ class ColorConfigResource extends Resource
         ];
     }
 
-    // public static function getNavigationBadge(): ?string
-    // {
-    //     return static::getModel()::count() ?: null;
-    // }
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('is_active', true)->count() ?: null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
 
     public static function canCreate(): bool
     {

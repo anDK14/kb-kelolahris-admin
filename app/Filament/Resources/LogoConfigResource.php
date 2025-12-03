@@ -198,12 +198,13 @@ class LogoConfigResource extends Resource
                 // ]),
             ])
             ->emptyStateHeading('Belum ada konfigurasi logo')
-            ->emptyStateDescription('Buat konfigurasi logo pertama Anda dengan mengklik tombol di bawah.')
-            ->emptyStateActions([
-                Tables\Actions\CreateAction::make()
-                    ->label('Buat Konfigurasi Logo')
-                    ->icon('heroicon-o-plus'),
-            ])
+            // ->emptyStateDescription('Buat konfigurasi logo pertama Anda dengan mengklik tombol di bawah.')
+            // ->emptyStateActions([
+            //     Tables\Actions\CreateAction::make()
+            //         ->label('Buat Konfigurasi Logo')
+            //         ->icon('heroicon-o-plus'),
+            // ])
+            ->defaultSort('updated_at', 'desc')
             ->recordUrl(null)
             ->striped()
             ->deferLoading();

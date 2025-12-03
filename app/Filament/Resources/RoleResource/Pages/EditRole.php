@@ -15,11 +15,6 @@ class EditRole extends EditRecord
 
     public Collection $permissions;
 
-    protected function getSavedNotificationTitle(): ?string
-    {
-        return 'Role berhasil diperbarui';
-    }
-
     protected function getActions(): array
     {
         return [
@@ -55,5 +50,25 @@ class EditRole extends EditRecord
         });
 
         $this->record->syncPermissions($permissionModels);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\DeleteAction::make()
+                ->successNotificationTitle(
+                    $this->getResource()::getModelLabel() . ' berhasil dihapus!'
+                ),
+        ];
+    }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return $this->getResource()::getModelLabel() . ' berhasil diperbarui!';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

@@ -188,7 +188,11 @@ class UserResource extends Resource
                     //     })
                     //     ->requiresConfirmation(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('updated_at', 'desc')
+            ->recordUrl(null)
+            ->striped()
+            ->deferLoading();
     }
 
     public static function getRelations(): array

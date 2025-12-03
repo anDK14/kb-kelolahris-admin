@@ -14,11 +14,6 @@ class CreateRole extends CreateRecord
 
     public Collection $permissions;
 
-    protected function getCreatedNotificationTitle(): ?string
-    {
-        return 'Role berhasil dibuat';
-    }
-
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $this->permissions = collect($data)
@@ -48,5 +43,15 @@ class CreateRole extends CreateRecord
         });
 
         $this->record->syncPermissions($permissionModels);
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return $this->getResource()::getModelLabel() . ' berhasil dibuat!';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

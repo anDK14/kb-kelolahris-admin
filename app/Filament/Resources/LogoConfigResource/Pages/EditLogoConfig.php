@@ -13,7 +13,20 @@ class EditLogoConfig extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->successNotificationTitle(
+                    $this->getResource()::getModelLabel() . ' berhasil dihapus!'
+                ),
         ];
+    }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return $this->getResource()::getModelLabel() . ' berhasil diperbarui!';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

@@ -74,16 +74,10 @@ class FaqResource extends Resource
                             ->columnSpanFull()
                             ->placeholder('Masukkan pertanyaan yang sering diajukan'),
 
-                        Forms\Components\RichEditor::make('answer')
+                        Forms\Components\Textarea::make('answer')
                             ->label('Jawaban')
                             ->required()
-                            ->toolbarButtons([
-                                'bold',
-                                'italic',
-                                'underline',
-                                'bulletList',
-                                'orderedList',
-                            ])
+                            ->rows(6)
                             ->columnSpanFull()
                             ->placeholder('Masukkan jawaban untuk pertanyaan di atas'),
                     ]),
@@ -263,6 +257,7 @@ class FaqResource extends Resource
                         ->icon('heroicon-o-trash'),
                 ]),
             ])
+            ->defaultSort('updated_at', 'desc')
             ->recordUrl(null)
             ->striped()
             ->deferLoading()

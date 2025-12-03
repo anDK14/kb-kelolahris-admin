@@ -12,12 +12,8 @@ class CreateMobileFeatureContent extends CreateRecord
 {
     protected static string $resource = MobileFeatureContentResource::class;
 
-    /**
-     * Mutasi data sebelum disimpan ke database.
-     */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // 1️⃣ Ambil nilai tipe konten dari URL kalau belum ada
         $data['content_type'] = $data['content_type'] ?? request()->query('content_type');
 
         if (empty($data['content_type'])) {
@@ -29,7 +25,6 @@ class CreateMobileFeatureContent extends CreateRecord
                 ->send();
         }
 
-        // 2️⃣ Tentukan urutan otomatis berdasarkan mobile_feature_id dan tipe konten
         if (!empty($data['mobile_feature_id']) && !empty($data['content_type'])) {
             $lastOrder = MobileFeatureContent::where('mobile_feature_id', $data['mobile_feature_id'])
                 ->where('content_type', $data['content_type'])
@@ -37,24 +32,12 @@ class CreateMobileFeatureContent extends CreateRecord
 
             $data['content_order'] = $lastOrder ? $lastOrder + 1 : 1;
         } else {
-            // Jika belum ada mobile_feature_id (belum dipilih)
             $data['content_order'] = 1;
         }
 
         return $data;
     }
 
-    /**
-     * Mengembalikan pengguna ke halaman yang benar setelah membuat data.
-     */
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
-
-    /**
-     * Notifikasi sukses setelah membuat data.
-     */
     protected function getCreatedNotification(): ?Notification
     {
         return Notification::make()
@@ -64,9 +47,6 @@ class CreateMobileFeatureContent extends CreateRecord
             ->send();
     }
 
-    /**
-     * Tindakan header halaman.
-     */
     protected function getHeaderActions(): array
     {
         return [
@@ -78,9 +58,6 @@ class CreateMobileFeatureContent extends CreateRecord
         ];
     }
 
-    /**
-     * Mengatur judul halaman
-     */
     public function getTitle(): string
     {
         $contentType = request()->query('content_type', 'fitur_utama');
@@ -95,5 +72,15 @@ class CreateMobileFeatureContent extends CreateRecord
         $typeLabel = $typeLabels[$contentType] ?? 'Konten Mobile';
 
         return "Tambah {$typeLabel}";
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return $this->getResource()::getModelLabel() . ' berhasil dibuat!';
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

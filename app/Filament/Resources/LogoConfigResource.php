@@ -50,6 +50,18 @@ class LogoConfigResource extends Resource
                             ->unique(ignoreRecord: true)
                             ->disabled(fn($record) => $record !== null)
                             ->helperText('Pilih bagian website yang ingin diatur logonya'),
+
+                        Forms\Components\Section::make('Status')
+                            ->description('Aktifkan atau nonaktifkan konfigurasi ini')
+                            ->schema([
+                                Forms\Components\Toggle::make('is_active')
+                                    ->label('Aktif')
+                                    ->default(true)
+                                    ->required()
+                                    ->helperText('Jika dinonaktifkan, warna default akan digunakan')
+                                    ->onColor('primary')
+                                    ->offColor('danger'),
+                            ]),
                     ]),
 
                 Forms\Components\Section::make('Pengaturan Logo')
@@ -69,27 +81,6 @@ class LogoConfigResource extends Resource
                             ->maxLength(200)
                             ->placeholder('Nama Perusahaan Logo')
                             ->helperText('Teks yang akan ditampilkan jika gambar tidak dapat dimuat'),
-
-                        // Forms\Components\Placeholder::make('logo_preview')
-                        //     ->label('Preview Logo')
-                        //     ->content(function ($get) {
-                        //         $url = $get('logo_url');
-                        //         if (!$url) {
-                        //             return '<div class="text-gray-500 text-sm">URL logo belum diisi</div>';
-                        //         }
-
-                        //         return "
-                        //             <div class='space-y-2'>
-                        //                 <div class='text-sm font-medium text-gray-700'>Preview:</div>
-                        //                 <div class='bg-gray-100 p-4 rounded-lg border border-gray-300'>
-                        //                     <img src='{$url}' alt='Preview' class='max-h-20 max-w-full object-contain mx-auto' onerror='this.style.display=\"none\"; document.getElementById(\"preview-status\").textContent=\"Gagal memuat gambar\"'>
-                        //                     <div class='text-xs text-gray-500 text-center mt-2' id='preview-status'>Memuat preview...</div>
-                        //                 </div>
-                        //                 <div class='text-xs text-gray-500 break-all'>URL: {$url}</div>
-                        //             </div>
-                        //         ";
-                        //     })
-                        //     ->visible(fn($get) => !empty($get('logo_url'))),
                     ]),
             ]);
     }
@@ -103,13 +94,6 @@ class LogoConfigResource extends Resource
                     ->formatStateUsing(fn($state) => match ($state) {
                         'navbar_logo' => 'Logo Navbar',
                         'footer_logo' => 'Logo Footer',
-                        // 'favicon' => 'Favicon',
-                        // 'mobile_logo' => 'Logo Mobile App',
-                        // 'admin_logo' => 'Logo Admin Panel',
-                        // 'email_logo' => 'Logo Email Signature',
-                        // 'print_logo' => 'Logo Cetak/Dokumen',
-                        // 'dark_logo' => 'Logo Mode Gelap',
-                        // 'light_logo' => 'Logo Mode Terang',
                         default => $state
                     })
                     ->sortable()
@@ -138,6 +122,15 @@ class LogoConfigResource extends Resource
                     })
                     ->searchable(),
 
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Status')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('logo_url')
                     ->label('URL Logo')
                     ->limit(40)
@@ -162,15 +155,19 @@ class LogoConfigResource extends Resource
                     ->options([
                         'navbar_logo' => 'Logo Navbar',
                         'footer_logo' => 'Logo Footer',
-                        // 'favicon' => 'Favicon',
-                        // 'mobile_logo' => 'Logo Mobile App',
-                        // 'admin_logo' => 'Logo Admin Panel',
-                        // 'email_logo' => 'Logo Email Signature',
-                        // 'print_logo' => 'Logo Cetak/Dokumen',
-                        // 'dark_logo' => 'Logo Mode Gelap',
-                        // 'light_logo' => 'Logo Mode Terang',
                     ])
                     ->placeholder('Semua Jenis'),
+
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Status Aktif')
+                    ->placeholder('Semua Status')
+                    ->trueLabel('Aktif')
+                    ->falseLabel('Tidak Aktif')
+                    ->queries(
+                        true: fn($query) => $query->where('is_active', true),
+                        false: fn($query) => $query->where('is_active', false),
+                        blank: fn($query) => $query,
+                    ),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -180,6 +177,22 @@ class LogoConfigResource extends Resource
                         ->color('success')
                         ->url(fn($record) => $record->logo_url, shouldOpenInNewTab: true)
                         ->tooltip('Lihat logo di tab baru'),
+
+                    Tables\Actions\Action::make('activate')
+                        ->label(fn($record) => $record->is_active ? 'Nonaktifkan' : 'Aktifkan')
+                        ->icon(fn($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                        ->color(fn($record) => $record->is_active ? 'danger' : 'success')
+                        ->action(function ($record) {
+                            // Jika akan mengaktifkan, nonaktifkan dulu yang lain dengan config_key sama
+                            if (!$record->is_active) {
+                                LogoConfig::where('config_key', $record->config_key)
+                                    ->where('id', '!=', $record->id)
+                                    ->update(['is_active' => false]);
+                            }
+
+                            $record->update(['is_active' => !$record->is_active]);
+                        })
+                        ->tooltip(fn($record) => $record->is_active ? 'Nonaktifkan logo ini' : 'Aktifkan logo ini'),
 
                     Tables\Actions\EditAction::make()
                         ->label('Edit')
@@ -192,18 +205,41 @@ class LogoConfigResource extends Resource
                     ->button(),
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make()
-                //         ->label('Hapus yang dipilih'),
-                // ]),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('activateSelected')
+                        ->label('Aktifkan yang dipilih')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                LogoConfig::where('config_key', $record->config_key)
+                                    ->update(['is_active' => false]);
+
+                                $record->update(['is_active' => true]);
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    Tables\Actions\BulkAction::make('deactivateSelected')
+                        ->label('Nonaktifkan yang dipilih')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                $record->update(['is_active' => false]);
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    // Tables\Actions\DeleteBulkAction::make()
+                    //     ->label('Hapus yang dipilih')
+                    //     ->requiresConfirmation()
+                    //     ->modalHeading('Hapus Konfigurasi Logo')
+                    //     ->modalDescription('Apakah Anda yakin ingin menghapus konfigurasi logo yang dipilih?')
+                    //     ->modalSubmitActionLabel('Ya, Hapus'),
+                ]),
             ])
             ->emptyStateHeading('Belum ada konfigurasi logo')
-            // ->emptyStateDescription('Buat konfigurasi logo pertama Anda dengan mengklik tombol di bawah.')
-            // ->emptyStateActions([
-            //     Tables\Actions\CreateAction::make()
-            //         ->label('Buat Konfigurasi Logo')
-            //         ->icon('heroicon-o-plus'),
-            // ])
             ->defaultSort('updated_at', 'desc')
             ->recordUrl(null)
             ->striped()
@@ -219,11 +255,6 @@ class LogoConfigResource extends Resource
         ];
     }
 
-    // public static function getNavigationBadge(): ?string
-    // {
-    //     return static::getModel()::count() ?: null;
-    // }
-
     public static function canCreate(): bool
     {
         return false;
@@ -232,5 +263,17 @@ class LogoConfigResource extends Resource
     public static function canDelete($record): bool
     {
         return false;
+    }
+
+    // Tambahkan badge di navigation untuk logo aktif
+    public static function getNavigationBadge(): ?string
+    {
+        $activeCount = static::getModel()::where('is_active', true)->count();
+        return $activeCount > 0 ? $activeCount : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'success';
     }
 }

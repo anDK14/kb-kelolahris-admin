@@ -11,7 +11,7 @@ class Submodule extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['module_id', 'name', 'description', 'view_count'];
+    protected $fillable = ['module_id', 'name', 'description', 'view_count', 'slug'];
 
     public function module(): BelongsTo
     {

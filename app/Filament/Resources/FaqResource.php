@@ -50,22 +50,76 @@ class FaqResource extends Resource
                                 Forms\Components\Select::make('submodule_id')
                                     ->label('Fitur Website')
                                     ->relationship('submodule', 'name')
-                                    ->required(fn() => request()->query('feature_type') === 'website')
+                                    ->required(function ($get) {
+                                        $featureType = $get('feature_type') ?? request()->query('feature_type', 'website');
+                                        return $featureType === 'website';
+                                    })
                                     ->searchable()
                                     ->preload()
                                     ->placeholder('Pilih fitur website')
-                                    ->disabled(fn() => request()->query('feature_type') === 'mobile'),
+                                    ->visible(function ($get) {
+                                        $featureType = $get('feature_type') ?? request()->query('feature_type', 'website');
+                                        return $featureType !== 'mobile';
+                                    })
+                                    ->rules([
+                                        function ($get) {
+                                            return function ($attribute, $value, $fail) use ($get) {
+                                                $featureType = $get('feature_type') ?? request()->query('feature_type');
+                                                $mobileFeatureId = $get('mobile_feature_id');
+
+                                                if ($featureType === 'website' && empty($value)) {
+                                                    $fail('Fitur Website wajib dipilih untuk FAQ Website');
+                                                }
+
+                                                if (empty($featureType) && empty($value) && empty($mobileFeatureId)) {
+                                                    $fail('Harap pilih salah satu: Fitur Website ATAU Fitur Mobile');
+                                                }
+                                            };
+                                        },
+                                    ])
+                                    ->validationMessages([
+                                        'required' => 'Fitur Website wajib dipilih untuk FAQ Website', // CUSTOM MESSAGE
+                                    ]),
 
                                 Forms\Components\Select::make('mobile_feature_id')
                                     ->label('Fitur Mobile')
                                     ->relationship('mobileFeature', 'name')
-                                    ->required(fn() => request()->query('feature_type') === 'mobile')
+                                    ->required(function ($get) {
+                                        $featureType = $get('feature_type') ?? request()->query('feature_type', 'website');
+                                        return $featureType === 'mobile';
+                                    })
                                     ->searchable()
                                     ->preload()
                                     ->placeholder('Pilih fitur mobile')
-                                    ->disabled(fn() => request()->query('feature_type') === 'website'),
+                                    ->visible(function ($get) {
+                                        $featureType = $get('feature_type') ?? request()->query('feature_type', 'website');
+                                        return $featureType !== 'website';
+                                    })
+                                    ->rules([
+                                        function ($get) {
+                                            return function ($attribute, $value, $fail) use ($get) {
+                                                $featureType = $get('feature_type') ?? request()->query('feature_type');
+                                                $submoduleId = $get('submodule_id');
+
+                                                if ($featureType === 'mobile' && empty($value)) {
+                                                    $fail('Fitur Mobile wajib dipilih untuk FAQ Mobile');
+                                                }
+
+                                                if (empty($featureType) && empty($value) && empty($submoduleId)) {
+                                                    $fail('Harap pilih salah satu: Fitur Website ATAU Fitur Mobile');
+                                                }
+                                            };
+                                        },
+                                    ])
+                                    ->validationMessages([
+                                        'required' => 'Fitur Mobile wajib dipilih untuk FAQ Mobile', // CUSTOM MESSAGE
+                                    ]),
                             ])
                             ->columnSpanFull(),
+
+                        Forms\Components\Hidden::make('feature_type')
+                            ->default(fn() => request()->query('feature_type', 'website'))
+                            ->dehydrated(true),
 
                         Forms\Components\Textarea::make('question')
                             ->label('Pertanyaan')

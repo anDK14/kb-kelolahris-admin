@@ -66,6 +66,15 @@ class MobileFeatureResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Masukkan nama fitur mobile'),
+                        
+                        // TAMBAHKAN FIELD SLUG DI SINI
+                        Forms\Components\TextInput::make('slug')
+                            ->label('Slug')
+                            ->required()
+                            ->maxLength(100)
+                            ->unique(ignoreRecord: true)
+                            ->placeholder('contoh: check-in')
+                            ->helperText('URL-friendly identifier untuk fitur mobile'),
 
                         Forms\Components\TextInput::make('view_count')
                             ->label('Jumlah Dilihat')
@@ -101,8 +110,19 @@ class MobileFeatureResource extends Resource
                     ->sortable()
                     ->searchable()
                     ->weight('semibold')
-                    ->color('primary')
+                    ->color('secondary')
                     ->size('lg'),
+                
+                // TAMBAHKAN COLUMN SLUG DI SINI
+                Tables\Columns\TextColumn::make('slug')
+                    ->label('Slug')
+                    ->sortable()
+                    ->searchable()
+                    ->color('gray')
+                    ->size('sm')
+                    ->copyable()
+                    ->copyMessage('Slug berhasil disalin')
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi')

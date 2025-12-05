@@ -11,7 +11,7 @@ class MobileFeature extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['mobile_module_id', 'name', 'description', 'view_count'];
+    protected $fillable = ['mobile_module_id', 'name', 'description', 'view_count', 'slug'];
 
     public function mobileModule(): BelongsTo
     {

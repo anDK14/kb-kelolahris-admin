@@ -79,7 +79,7 @@ class ColorConfigResource extends Resource
                             ->default(true)
                             ->required()
                             ->helperText('Jika dinonaktifkan, warna default akan digunakan')
-                            ->onColor('success')
+                            ->onColor('primary')
                             ->offColor('danger'),
                     ]),
             ]);

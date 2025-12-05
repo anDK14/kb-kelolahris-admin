@@ -195,7 +195,7 @@ class MobileFeatureContentsRelationManager extends RelationManager
                     ->icon('heroicon-o-arrow-right-circle')
                     ->color('primary')
                     ->url(fn($livewire) => \App\Filament\Resources\MobileFeatureContentResource::getUrl('index', [
-                        'tableFilters[mobile_feature][value]' => $livewire->ownerRecord->id
+                        'tableFilters[mobileFeature][value]' => $livewire->ownerRecord->id
                     ])),
             ])
             ->actions([

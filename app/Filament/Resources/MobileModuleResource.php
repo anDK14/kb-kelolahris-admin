@@ -47,6 +47,16 @@ class MobileModuleResource extends Resource
                             ->maxLength(255)
                             ->placeholder('Masukkan nama modul mobile')
                             ->columnSpan(2),
+                        
+                        // TAMBAHKAN FIELD SLUG DI SINI
+                        Forms\Components\TextInput::make('slug')
+                            ->label('Slug')
+                            ->required()
+                            ->maxLength(100)
+                            ->unique(ignoreRecord: true)
+                            ->placeholder('contoh: absensi')
+                            ->helperText('URL-friendly identifier untuk modul mobile')
+                            ->columnSpan(2),
 
                         Forms\Components\Textarea::make('description')
                             ->label('Deskripsi')
@@ -79,6 +89,17 @@ class MobileModuleResource extends Resource
                     ->weight('semibold')
                     ->color('secondary')
                     ->size('lg'),
+                
+                // TAMBAHKAN COLUMN SLUG DI SINI
+                Tables\Columns\TextColumn::make('slug')
+                    ->label('Slug')
+                    ->sortable()
+                    ->searchable()
+                    ->color('gray')
+                    ->size('sm')
+                    ->copyable()
+                    ->copyMessage('Slug berhasil disalin')
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\TextColumn::make('description')
                     ->label('Deskripsi')
